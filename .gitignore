@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/target
+.idea/
+/*.log
+*.DS_Store
+application.properties
