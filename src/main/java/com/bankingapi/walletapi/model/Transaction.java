@@ -30,6 +30,6 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "reciever_account_id", nullable = false)
-    private BankAccount recieverAccount;
+    private BankAccount receiverAccount;
 
 }
