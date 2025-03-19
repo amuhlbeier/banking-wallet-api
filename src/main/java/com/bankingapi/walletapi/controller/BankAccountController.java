@@ -1,4 +1,6 @@
 package com.bankingapi.walletapi.controller;
+import com.bankingapi.walletapi.dto.BankAccountResponse;
+import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
 import com.bankingapi.walletapi.service.BankAccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +23,18 @@ public class BankAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BankAccount>> getAllAccounts() {
+    public ResponseEntity<List<BankAccountResponse>> getAllAccounts() {
         return ResponseEntity.ok(bankAccountService.getAllAccounts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BankAccount> getAccountById(@PathVariable Long id) {
+    public ResponseEntity<BankAccountResponse> getAccountById(@PathVariable Long id) {
         return ResponseEntity.ok(bankAccountService.getAccountById(id));
     }
 
     @PostMapping
-    public ResponseEntity<BankAccount> createAccount(@Valid @RequestBody BankAccount account) {
-       BankAccount createdAccount = bankAccountService.createAccount(account);
+    public ResponseEntity<BankAccountResponse> createAccount(@Valid @RequestBody BankAccount account) {
+       BankAccountResponse createdAccount = bankAccountService.createAccount(account);
        return ResponseEntity.ok(createdAccount);
     }
 
@@ -41,6 +43,23 @@ public class BankAccountController {
         bankAccountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/deposit")
+    public ResponseEntity<BankAccountResponse> deposit(
+            @PathVariable Long id,
+            @RequestBody @Valid DepositWithdrawRequest request
+    ) {
+        return ResponseEntity.ok(bankAccountService.depositFunds(id, request));
+    }
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<BankAccountResponse> withdraw(
+            @PathVariable Long id,
+            @RequestBody @Valid DepositWithdrawRequest request
+    ) {
+        return ResponseEntity.ok(bankAccountService.withdrawFunds(id, request));
+    }
+
 
 
 }
