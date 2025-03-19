@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
+import com.bankingapi.walletapi.dto.TransactionResponse;
+import com.bankingapi.walletapi.dto.TransferRequest;
 
 import java.util.List;
 import java.math.BigDecimal;
@@ -34,13 +36,8 @@ public class TransactionController {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<Transaction> transferFunds(@RequestBody @Valid TransferRequest request) {
-        Transaction result = transactionService.transferFunds (
-                request.getSenderId(),
-                request.getReceiverId(),
-                request.getAmount(),
-                request.getDescription()
-        );
+    public ResponseEntity<TransactionResponse> transferFunds(@RequestBody @Valid TransferRequest request) {
+        TransactionResponse result = transactionService.transferFunds(request);
         return ResponseEntity.ok(result);
     }
 }
