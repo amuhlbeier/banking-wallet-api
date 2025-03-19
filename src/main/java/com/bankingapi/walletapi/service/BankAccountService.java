@@ -1,5 +1,6 @@
 package com.bankingapi.walletapi.service;
 
+import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
 import com.bankingapi.walletapi.model.BankAccount;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,17 @@ public class BankAccountService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
-    public BankAccountResponse createAccount(BankAccount account) {
+    public BankAccountResponse createAccount(BankAccountRequest request) {
+        User user = new User();
+        user.setId(request.getUserId());
+
+        BankAccount account = new BankAccount();
+        account.setAccountNumber(request.getAccountNumber());
+        account.setAccountType(request.getAccountType());
+        account.setUser(user);
+        account.setCreatedAt(LocalDateTime.now());
+        account.setBalance(BigDecimal.ZERO);
+
         BankAccount saved = bankAccountRepository.save(account);
         return mapToDTO(saved);
     }

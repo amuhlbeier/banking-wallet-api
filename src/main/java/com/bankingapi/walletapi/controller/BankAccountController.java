@@ -1,4 +1,5 @@
 package com.bankingapi.walletapi.controller;
+import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
 import com.bankingapi.walletapi.service.BankAccountService;
@@ -33,8 +34,9 @@ public class BankAccountController {
     }
 
     @PostMapping
-    public ResponseEntity<BankAccountResponse> createAccount(@Valid @RequestBody BankAccount account) {
-       BankAccountResponse createdAccount = bankAccountService.createAccount(account);
+    public ResponseEntity<BankAccountResponse> createAccount(
+            @Valid @RequestBody BankAccountRequest request) {
+       BankAccountResponse createdAccount = bankAccountService.createAccount(request);
        return ResponseEntity.ok(createdAccount);
     }
 
