@@ -12,7 +12,10 @@ import com.bankingapi.walletapi.dto.TransactionResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TransactionService {
@@ -75,6 +78,19 @@ public class TransactionService {
             dto.setDescription(transaction.getDescription());
             dto.setCreatedAt(transaction.getCreatedAt());
             return dto;
+        }
+
+        public List<TransactionResponse> getTransactionsByAccountId(Long accountId) {
+            List<Transaction> sent = transactionRepository.findBySenderAccount_Id(accountId);
+            List<Transaction> received = transactionRepository.findByReceiverAccount_Id(accountId);
+
+            List<Transaction> allTransactions = new ArrayList<>();
+            allTransactions.addAll(sent);
+            allTransactions.addAll(received);
+
+            return allTransactions.stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
         }
 
 
