@@ -152,13 +152,42 @@ public class TransactionController {
                     responseCode = "500",
                     description = "Internal server error")
     })
-    @GetMapping("/filter")
+    @GetMapping("/filter/date")
     public ResponseEntity<List<TransactionResponse>> getTransactionsByDateRange(
             @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
             @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
     ) {
         List<TransactionResponse> filtered = transactionService.getTransactionsByDateRange(fromDate, toDate);
         return ResponseEntity.ok(filtered);
+    }
+
+
+    @Operation(
+            summary = "Filter transactions by amount range",
+            description = "Returns a list of all transactions within a specific amount range"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transactions successfully retrieved",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid amount range"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error")
+    })
+
+    @GetMapping("/filter/amount)")
+    public ResponseEntity<List<TransactionResponse>> getTransactionsByAmountRange(
+            @RequestParam("minAmount") BigDecimal minAmount,
+            @RequestParam("maxAmount") BigDecimal maxAmount
+    ) {
+        List<TransactionResponse> result = transactionService.getTransactionsByAmountRange(minAmount, maxAmount);
+        return ResponseEntity.ok(result);
     }
 
 }

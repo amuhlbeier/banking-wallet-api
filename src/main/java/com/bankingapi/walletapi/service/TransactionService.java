@@ -100,5 +100,12 @@ public class TransactionService {
                     .collect(Collectors.toList());
         }
 
+        public List<TransactionResponse> getTransactionsByAmountRange(BigDecimal minAmount, BigDecimal maxAmount) {
+           List<Transaction> transactions = transactionRepository.findByAmountBetween(minAmount, maxAmount);
+           return transactions.stream()
+                   .map(this::mapToDTO)
+                   .collect(Collectors.toList());
+        }
+
 
 }
