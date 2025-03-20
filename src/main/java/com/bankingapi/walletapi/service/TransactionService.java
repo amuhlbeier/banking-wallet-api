@@ -16,9 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class TransactionService {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     private final TransactionRepository transactionRepository;
     private final BankAccountRepository bankAccountRepository;
@@ -39,11 +42,18 @@ public class TransactionService {
     }
 
     public TransactionResponse transferFunds(TransferRequest request) {
+        logger.info("Initiating transfer of amount: {}", request.getAmount());
         BankAccount sender = bankAccountRepository.findById(request.getSenderId())
-                .orElseThrow(() -> new RuntimeException("Sender account not found."));
+                .orElseThrow(() -> {
+                    logger.error("Sender account with ID {} not found", request.getSenderId());
+                    return new RuntimeException("Sender account not found.");
+                });
 
         BankAccount receiver = bankAccountRepository.findById(request.getReceiverId())
-                .orElseThrow(() -> new RuntimeException("Receiver account not found."));
+                .orElseThrow(() -> {
+                    logger.error("Receiver account with ID {} not found.", request.getReceiverId());
+                    return new RuntimeException("Receiver account not found.");
+                });
 
         BigDecimal amount = request.getAmount();
         if (sender.getBalance().compareTo(amount) < 0) {
@@ -56,6 +66,8 @@ public class TransactionService {
         bankAccountRepository.save(receiver);
         bankAccountRepository.save(sender);
 
+        logger.info("Transfer completed. Sender new balance: {}", sender.getBalance());
+
         Transaction transaction = new Transaction();
         transaction.setSenderAccount(sender);
         transaction.setReceiverAccount(receiver);
@@ -64,6 +76,7 @@ public class TransactionService {
         transaction.setCreatedAt(LocalDateTime.now());
 
         Transaction savedTransaction = transactionRepository.save(transaction);
+        logger.info("Transaction ID: {}", savedTransaction.getId());
 
         return mapToDTO(savedTransaction);
 
