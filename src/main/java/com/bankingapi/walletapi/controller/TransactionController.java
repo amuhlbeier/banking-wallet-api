@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bankingapi.walletapi.dto.TransactionResponse;
 import com.bankingapi.walletapi.dto.TransferRequest;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.math.BigDecimal;
@@ -197,6 +199,13 @@ public class TransactionController {
     ) {
         List<TransactionResponse> result = transactionService.getTransactionsByAmountRange(minAmount, maxAmount);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/export")
+    public void exportTransactionsToCsv(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=transactions.csv");
+        transactionService.exportTransactionsToCsv(response.getWriter());
     }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.bankingapi.walletapi.dto.TransactionResponse;
 
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -125,6 +126,22 @@ public class TransactionService {
         public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
            Page<Transaction> transactions = transactionRepository.findAll(pageable);
            return transactions.map(this::mapToDTO);
+        }
+
+        public void exportTransactionsToCsv(PrintWriter writer) {
+           List<Transaction> transactions = transactionRepository.findAll();
+
+           writer.println("Transaction ID, Sender ID, Receiver ID, Amount, Description,CreatedAt");
+           for (Transaction t : transactions) {
+               writer.println(String.format("%d,%d,%d,%.2f,%s,%s",
+                       t.getId(),
+                       t.getSenderAccount().getId(),
+                       t.getReceiverAccount().getId(),
+                       t.getAmount(),
+                       t.getDescription(),
+                       t.getCreatedAt().toString()
+               ));
+           }
         }
 
 
