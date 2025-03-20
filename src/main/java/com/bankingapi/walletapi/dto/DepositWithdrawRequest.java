@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Request object for depositing or withdrawing funds")
 public class DepositWithdrawRequest {
 
     @Schema(

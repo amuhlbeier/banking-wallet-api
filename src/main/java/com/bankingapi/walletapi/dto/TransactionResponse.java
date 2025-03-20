@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Response object containing transaction details")
 public class TransactionResponse {
 
     @Schema(

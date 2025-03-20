@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description= "Request object for transferring funds between accounts")
 public class TransferRequest {
 
     @Schema(

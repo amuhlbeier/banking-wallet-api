@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Response object containing bank account details")
 public class BankAccountResponse {
 
     @Schema(
