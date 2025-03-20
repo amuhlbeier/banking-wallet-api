@@ -7,6 +7,8 @@ import com.bankingapi.walletapi.repository.BankAccountRepository;
 import com.bankingapi.walletapi.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.bankingapi.walletapi.dto.TransactionResponse;
 
@@ -118,6 +120,11 @@ public class TransactionService {
            return transactions.stream()
                    .map(this::mapToDTO)
                    .collect(Collectors.toList());
+        }
+
+        public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
+           Page<Transaction> transactions = transactionRepository.findAll(pageable);
+           return transactions.map(this::mapToDTO);
         }
 
 

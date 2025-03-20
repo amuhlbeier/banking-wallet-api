@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,22 +40,28 @@ public class TransactionController {
 
     @Operation(
             summary = "Get all transactions",
-            description = "Returns a list of all transactions"
+            description = "Returns all transactions"
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Transactions successfully retrieved",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Transaction.class))
+                            schema = @Schema(implementation = TransactionResponse.class))
             ),
             @ApiResponse(
                     responseCode = "500",
                     description = "Internal server error")
     })
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        return ResponseEntity.ok(transactionService.getAllTransactions());
+    public ResponseEntity<Page<TransactionResponse>> getAllTransactions(
+            @RequestParam(defaultValue ="0") int page,
+            @RequestParam(defaultValue ="10") int size
+            ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TransactionResponse> paginatedTransactions = transactionService.getAllTransactions(pageable);
+        return ResponseEntity.ok(paginatedTransactions);
+
     }
 
 
