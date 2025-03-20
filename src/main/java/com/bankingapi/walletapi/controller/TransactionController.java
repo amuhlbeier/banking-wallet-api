@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import com.bankingapi.walletapi.dto.TransactionResponse;
 import com.bankingapi.walletapi.dto.TransferRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.math.BigDecimal;
 
@@ -130,4 +132,33 @@ public class TransactionController {
         List<TransactionResponse> history = transactionService.getTransactionsByAccountId(accountId);
         return ResponseEntity.ok(history);
     }
+
+
+    @Operation(
+            summary = "Filter transactions by date range",
+            description = "Returns a list of all transactions within a specific date range"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Transactions successfully retrieved",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TransactionResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid date range"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error")
+    })
+    @GetMapping("/filter")
+    public ResponseEntity<List<TransactionResponse>> getTransactionsByDateRange(
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
+    ) {
+        List<TransactionResponse> filtered = transactionService.getTransactionsByDateRange(fromDate, toDate);
+        return ResponseEntity.ok(filtered);
+    }
+
 }

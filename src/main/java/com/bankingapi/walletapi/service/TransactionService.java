@@ -93,5 +93,12 @@ public class TransactionService {
                     .collect(Collectors.toList());
         }
 
+        public List<TransactionResponse> getTransactionsByDateRange(LocalDateTime fromDate, LocalDateTime toDate) {
+            List<Transaction> transactions = transactionRepository.findByCreatedAtBetween(fromDate,toDate);
+            return transactions.stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        }
+
 
 }
