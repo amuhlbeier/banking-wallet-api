@@ -201,6 +201,20 @@ public class TransactionController {
         return ResponseEntity.ok(result);
     }
 
+
+    @Operation(
+            summary = "Export all transactions to CSV file",
+            description = "Exports all transactions in the system as a downloadable CSV file"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "CSV successfully downloaded"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error")
+    })
     @GetMapping("/csv")
     public void exportTransactionsToCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
