@@ -201,7 +201,7 @@ public class TransactionController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/export")
+    @GetMapping("/csv")
     public void exportTransactionsToCsv(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=transactions.csv");
