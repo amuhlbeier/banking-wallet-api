@@ -31,6 +31,8 @@ public class BankAccount {
 
     private LocalDateTime createdAt;
 
+    private boolean frozen = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

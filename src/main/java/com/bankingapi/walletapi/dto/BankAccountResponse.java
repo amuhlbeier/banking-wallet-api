@@ -28,4 +28,7 @@ public class BankAccountResponse {
             example = "2025-03-17T14:30:00"
     )
     private LocalDateTime createdAt;
+
+    @Schema(description = "Indiactes whether the account is frozen", example = "false")
+    private boolean frozen;
 }

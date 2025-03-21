@@ -188,4 +188,16 @@ public class BankAccountController {
         return ResponseEntity.ok(bankAccountService.withdrawFunds(id, request));
     }
 
+    @PutMapping("/{id}/freeze")
+    public ResponseEntity<Void> freezeAccount(@PathVariable Long id) {
+        bankAccountService.freezeAccount(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/freeze")
+    public ResponseEntity<Void> unfreezeAccount(@PathVariable Long id) {
+        bankAccountService.unfreezeAccount(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
