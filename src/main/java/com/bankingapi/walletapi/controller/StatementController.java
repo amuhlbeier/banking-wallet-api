@@ -2,6 +2,8 @@ package com.bankingapi.walletapi.controller;
 
 import com.bankingapi.walletapi.service.PdfStatementService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 
 @RestController
 @RequestMapping("/api/statements")
@@ -60,6 +63,40 @@ public class StatementController {
             throw new RuntimeException("Error while generating PDF", e);
         }
 
+    }
+
+    @GetMapping("/monthly-pdf")
+    @Operation(
+            summary = "Download monthly PDF statement",
+            description = "Generates a monthly statement as a PDF file"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "PDF successfully generated"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error")
+    })
+    public void downloadMonthlyStatement(
+            @RequestParam Long accountId,
+            @RequestParam int year,
+            @RequestParam int month,
+            HttpServletResponse response
+    ) {
+        try {
+            YearMonth yearMonth = YearMonth.of(year, month);
+            byte[] pdf = pdfStatementService.generateMonthlyStatementPdf(accountId, yearMonth);
+
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=statement.pdf");
+            response.getOutputStream().write(pdf);
+            response.flushBuffer();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error while generating monthly PDF", e);
+        }
     }
 
 }
