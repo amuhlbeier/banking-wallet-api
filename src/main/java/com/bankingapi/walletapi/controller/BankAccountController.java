@@ -194,7 +194,7 @@ public class BankAccountController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}/freeze")
+    @PutMapping("/{id}/unfreeze")
     public ResponseEntity<Void> unfreezeAccount(@PathVariable Long id) {
         bankAccountService.unfreezeAccount(id);
         return ResponseEntity.noContent().build();

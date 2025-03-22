@@ -48,7 +48,7 @@ public class KafkaConfig {
         );
     }
 
-    @Bean
+    @Bean(name ="bankAccountKafkaListenerFactory")
     public ConcurrentKafkaListenerContainerFactory<String, BankAccountEvent> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, BankAccountEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
