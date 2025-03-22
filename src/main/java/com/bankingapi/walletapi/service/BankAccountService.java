@@ -7,6 +7,7 @@ import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
 import com.bankingapi.walletapi.model.BankAccount;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
 import com.bankingapi.walletapi.model.User;
+import com.bankingapi.walletapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class BankAccountService {
     private final BankAccountRepository bankAccountRepository;
+    private final UserRepository userRepository;
     private final KafkaTemplate<String, BankAccountEvent> kafkaTemplate;
     private static final Logger logger = LoggerFactory.getLogger(BankAccountService.class);
 
@@ -29,9 +31,10 @@ public class BankAccountService {
     private static final BigDecimal MAX_OVERDRAFT = new BigDecimal("-100.00");
 
     @Autowired
-    public BankAccountService(BankAccountRepository bankAccountRepository, KafkaTemplate<String, BankAccountEvent> kafkaTemplate) {
+    public BankAccountService(BankAccountRepository bankAccountRepository, KafkaTemplate<String, BankAccountEvent> kafkaTemplate, UserRepository userRepository) {
         this.bankAccountRepository = bankAccountRepository;
         this.kafkaTemplate = kafkaTemplate;
+        this.userRepository = userRepository;
     }
 
     public List<BankAccountResponse> getAllAccounts() {
@@ -42,8 +45,9 @@ public class BankAccountService {
     }
     public BankAccountResponse createAccount(BankAccountRequest request) {
         logger.info("Creating a new bank account for user ID: {}", request.getUserId());
-        User user = new User();
-        user.setId(request.getUserId());
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
+
 
         BankAccount account = new BankAccount();
         account.setAccountNumber(request.getAccountNumber());
