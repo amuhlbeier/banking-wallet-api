@@ -93,3 +93,44 @@ export const exportTransactionsToCSV = async () => {
     console.error('Failed to export CSV:', error);
   }
 };
+
+export const exportStatementsToPDF = async (accountId, from, to) => {
+  try {
+    const response = await api.get('/statements/pdf', {
+      params: { accountId, from, to },
+      responseType: 'blob',
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'statement.pdf');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+  } catch (error) {
+    console.error('Failed to export statement PDF:', error);
+  }
+};
+
+export const exportMonthlyStatementToPDF = async (accountId, year, month) => {
+  try {
+    const response = await api.get('/statements/monthly-pdf', {
+      params: { accountId, year, month },
+      responseType: 'blob',
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `statement-${year}-${month}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+  } catch (error) {
+    console.error('Failed to export monthly statement PDF:', error);
+  }
+};
+
