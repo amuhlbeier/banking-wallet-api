@@ -54,3 +54,23 @@ export const deleteAccount = async (id) => {
     throw error;
   }
 };
+
+export const freezeAccount = async (id) => {
+  try {
+    const response = await api.put(`/accounts/${id}/freeze`);
+    return response.data;
+  } catch (error) {
+    console.error('Error freezing account: ', error);
+    throw error;
+  }
+};
+
+export const unfreezeAccount = async (id) => {
+  try {
+    const response = await api.put(`/accounts/${id}/unfreeze`);
+    return response.data;
+  } catch (error) {
+    console.error('Error unfreezing account: ', error);
+    throw error;
+  }
+};
