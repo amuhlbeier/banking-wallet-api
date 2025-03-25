@@ -158,3 +158,33 @@ export const getTransactionById = async (id) => {
     throw error;
   }
 };
+
+export const getTransactionsByDateRange = async (fromDate, toDate) => {
+  try {
+    const response = await api.get('/transactions/filter/date', {
+      params: {
+       fromDate: from,
+       toDate: to,
+      }, 
+    });   
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch transactions by date', error);
+    throw error;
+  }
+};
+
+export const getTransactionsByAmountRange = async (minAmount, maxAmount) => {
+  try {
+    const response = await api.get('/transactions/filter/amount', {
+      params: {
+        minAmount: min,
+        maxAmount: max,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch transactions by amount range', error);
+    throw error;
+  }
+};
