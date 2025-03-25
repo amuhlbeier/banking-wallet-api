@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { transferFunds } from '../services/bankService';
+
 
 const TransferForm = ({ onTransfer }) => {
   const [senderId, setSenderId] = useState('');
   const [receiverId, setReceiverId] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleTransfer = async (e) => {
     e.preventDefault();

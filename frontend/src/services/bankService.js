@@ -1,4 +1,4 @@
-import api from '../api';
+import api from '../api/axios';
 
 export const getAllAccounts = async () => {
   const response = await api.get('/accounts');
@@ -163,8 +163,8 @@ export const getTransactionsByDateRange = async (fromDate, toDate) => {
   try {
     const response = await api.get('/transactions/filter/date', {
       params: {
-       fromDate: from,
-       toDate: to,
+       fromDate,
+       toDate,
       }, 
     });   
     return response.data;
@@ -178,13 +178,44 @@ export const getTransactionsByAmountRange = async (minAmount, maxAmount) => {
   try {
     const response = await api.get('/transactions/filter/amount', {
       params: {
-        minAmount: min,
-        maxAmount: max,
+        minAmount,
+        maxAmount,
       },
     });
     return response.data;
   } catch (error) {
     console.error('Failed to fetch transactions by amount range', error);
+    throw error;
+  }
+};
+
+export const createUser = async (userData) => {
+  try {
+    const response = await api.post("/users", userData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+};
+
+
+export const getAllUsers = async () => {
+  try {
+    const response = await api.get('/users');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+};
+
+export const getUserById = async (id) => {
+  try {
+    const response = await api.get(`/accounts/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
     throw error;
   }
 };

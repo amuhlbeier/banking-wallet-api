@@ -6,6 +6,7 @@ import AccountDetailsPage from './pages/AccountDetailsPage';
 import LoginPage from './pages/LoginPage';
 import StatementsPage from './pages/StatementsPage';
 import TransferPage from './pages/TransferPage';
+import UsersPage from './pages/UsersPage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/statements" element={<StatementsPage />} />
         <Route path="/transfer" element={<TransferPage />} />
+        <Route path="/users" element={<UsersPage />} />
 
       </Routes>
     </Router>
