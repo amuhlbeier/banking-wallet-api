@@ -86,8 +86,8 @@ public class TransactionController {
                     description = "Internal server error")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
-        return ResponseEntity.ok(transactionService.getTransactionById(id));
+    public ResponseEntity<TransactionResponse> getTransactionById(@PathVariable Long id) {
+        return ResponseEntity.ok(transactionService.getTransactionResponseById(id));
     }
 
 

@@ -44,6 +44,11 @@ public class TransactionService {
                 .orElseThrow(() -> new RuntimeException("Transaction not found."));
     }
 
+    public TransactionResponse getTransactionResponseById(Long id) {
+        Transaction transaction = getTransactionById(id);
+        return mapToDTO(transaction);
+    }
+
     public TransactionResponse transferFunds(TransferRequest request) {
         logger.info("Initiating transfer of amount: {}", request.getAmount());
         BankAccount sender = bankAccountRepository.findById(request.getSenderId())
