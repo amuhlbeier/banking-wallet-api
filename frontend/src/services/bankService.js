@@ -134,3 +134,27 @@ export const exportMonthlyStatementToPDF = async (accountId, year, month) => {
   }
 };
 
+export const transferFunds = async (senderId, receiverId, amount, description) => {
+  try {
+    const response = await api.post('/transactions/transfer', {
+       senderId,
+       receiverId,
+       amount,
+       description,
+    });   
+    return response.data;
+  } catch (error) {
+    console.error('Failed to transfer funds', error);
+    throw error;
+  }
+};
+
+export const getTransactionById = async (id) => {
+  try {
+    const response = await api.get(`/transactions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to retrieve transactions: ', error);
+    throw error;
+  }
+};
