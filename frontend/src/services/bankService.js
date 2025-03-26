@@ -1,8 +1,23 @@
 import api from '../api/axios';
 
+export const createAccount = async (accountData) => {
+  try {
+    const response = await api.post('/accounts', accountData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating account:', error);
+    throw error;
+  }
+};
+
 export const getAllAccounts = async () => {
-  const response = await api.get('/accounts');
-  return response.data;
+  try {
+   const response = await api.get('/accounts');
+   return response.data;
+ } catch (error) {
+   console.error('Error fetching accounts:', error);
+   throw error;
+ } 
 };
 
 export const getAccountById = async (id) => {
@@ -144,7 +159,7 @@ export const transferFunds = async (senderId, receiverId, amount, description) =
     });   
     return response.data;
   } catch (error) {
-    console.error('Failed to transfer funds', error);
+    console.error('Error transferring funds', error);
     throw error;
   }
 };
@@ -154,7 +169,7 @@ export const getTransactionById = async (id) => {
     const response = await api.get(`/transactions/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Failed to retrieve transactions: ', error);
+    console.error('Error fetching transactions by ID: ', error);
     throw error;
   }
 };
@@ -169,7 +184,7 @@ export const getTransactionsByDateRange = async (fromDate, toDate) => {
     });   
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch transactions by date', error);
+    console.error('Error fetching transactions by date range', error);
     throw error;
   }
 };
@@ -184,21 +199,10 @@ export const getTransactionsByAmountRange = async (minAmount, maxAmount) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch transactions by amount range', error);
+    console.error('Error fetching transactions by amount range', error);
     throw error;
   }
 };
-
-export const createUser = async (userData) => {
-  try {
-    const response = await api.post("/users", userData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
-  }
-};
-
 
 export const getAllUsers = async () => {
   try {
@@ -212,7 +216,7 @@ export const getAllUsers = async () => {
 
 export const getUserById = async (id) => {
   try {
-    const response = await api.get(`/accounts/${id}`);
+    const response = await api.get(`/users/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching user by ID:', error);

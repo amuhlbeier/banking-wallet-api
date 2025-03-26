@@ -70,7 +70,7 @@ const UsersPage = () => {
           <h3 className="text-lg font-semibold mt-4">View All Users</h3>
           <button
             onClick={handleFetchAllUsers}
-            className="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+            className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Load All Users
           </button>

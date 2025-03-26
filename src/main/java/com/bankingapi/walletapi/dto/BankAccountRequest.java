@@ -12,25 +12,16 @@ import jakarta.validation.constraints.NotNull;
 @Schema(description = "Request DTO for creating a new bank account")
 public class BankAccountRequest {
 
-    @Schema(
-            description = "Unique account number assigned to the bank account",
-            example = "1234567890"
-    )
-    @NotNull(message = "Account number is required")
-    private String accountNumber;
-
 
     @Schema(
-            description = "Type of the bank account",
-            example = "SAVINGS"
+            description = "Type of the bank account"
     )
     @NotNull(message = "Account type is required")
     private String accountType;
 
 
     @Schema(
-            description = "ID of the user who owns the account",
-            example = "101"
+            description = "ID of the user who owns the account"
     )
     @NotNull(message = "User ID is required")
     private Long userId;

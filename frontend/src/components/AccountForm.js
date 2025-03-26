@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import React, { useState, useEffect } from 'react';
 import { createAccount } from '../services/bankService';
 import { getAllAccounts } from '../services/bankService';
@@ -6,7 +5,6 @@ import { getAllAccounts } from '../services/bankService';
 
 const AccountForm = () => {
   const [formData, setFormData] = useState({
-    accountNumber: '',
     accountType: '',
     userId: ''
   });
@@ -28,13 +26,41 @@ const AccountForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create Account</h2>
-      <input name="accountNumber" placeholder="Account Number" onChange={handleChange} />
-      <input name="accountType" placeholder="Account Type (SAVINGS/CHECKING)" onChange={handleChange} />
-      <input name="userId" placeholder="User ID" onChange={handleChange} />
-      <button type="submit">Create Account</button>
-    </form>
+    <form onSubmit={handleSubmit} className="space-y-4">
+
+  <div className="mb-4">
+    <label htmlFor="userId" className="block text-sm font-medium mb-1">User ID:</label>
+    <input
+      type="number"
+      name="userId"
+      id="userId"
+      value={formData.userId}
+      onChange={handleChange}
+      className="w-full border p-2 rounded"
+    />
+  </div>
+
+  <div className="mb-4">
+    <label htmlFor="accountType" className="block text-sm font-medium mb-1">Account Type:</label>
+    <select
+      name="accountType"
+      id="accountType"
+      value={formData.accountType}
+      onChange={handleChange}
+      className="w-full border p-2 rounded"
+    >
+      <option value="">Select Account Type</option>
+      <option value="SAVINGS">Savings</option>
+      <option value="CHECKING">Checking</option>
+    </select>
+  </div>
+
+  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    Create Account
+  </button>
+</form>
+
+    
   );
 };
 

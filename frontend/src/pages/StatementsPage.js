@@ -65,7 +65,7 @@ const StatementsPage = () => {
           />
           <button
             onClick={handleFullPDF}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Download PDF
           </button>
@@ -91,7 +91,7 @@ const StatementsPage = () => {
           />
           <button
             onClick={handleMonthlyPDF}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Download Monthly PDF
           </button>

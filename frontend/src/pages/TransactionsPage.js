@@ -1,8 +1,14 @@
-import React from 'react';
-import React, { useState, useEffect } from 'react';
-import { getAllTransactions } from '../services/bankService';
 import TransactionList from '../components/TransactionList';
-import { exportTransactionsToCSV } from '../services/bankService';
+import React, { useState, useEffect } from 'react';
+import {
+  getTransactionById,
+  getTransactionsByDateRange,
+  getTransactionsByAmountRange,
+  getAllTransactions,
+  exportTransactionsToCSV,
+} from '../services/bankService';
+
+
 
 const TransactionsPage = () => {
     const [transactions, setTransactions] = useState([]);

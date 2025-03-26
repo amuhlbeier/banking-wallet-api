@@ -50,7 +50,8 @@ public class BankAccountService {
 
 
         BankAccount account = new BankAccount();
-        account.setAccountNumber(request.getAccountNumber());
+        String generatedNumber = "ACCT-" + (int)(Math.random() * 1_000_000);
+        account.setAccountNumber(generatedNumber);
         account.setAccountType(request.getAccountType());
         account.setUser(user);
         account.setCreatedAt(LocalDateTime.now());
