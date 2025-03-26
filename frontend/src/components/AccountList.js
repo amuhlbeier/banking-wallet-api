@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { deleteAccount, freezeAccount, unfreezeAccount } from '../services/bankService';
+import WithdrawForm from '../components/WithdrawForm';
+import DepositForm from '../components/DepositForm';
+
+const AccountList = ({ accounts, onDelete }) => {
+    const [activeForm, setActiveForm] = useState({});
 
 const AccountList = ({ accounts, onDelete }) => {
     if (!accounts || accounts.length === 0) {
         return <p className ="text-gray-500">No accounts found.</p>
     }
+
+    const toggleForm = (accountId, formType) => {
+        setActiveForm((prev) => ({
+          ...prev,
+          [accountId]: prev[accountId] === formType ? null : formType,
+        }));
+    };
+
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this account?')) {
           try {
@@ -63,11 +76,40 @@ const AccountList = ({ accounts, onDelete }) => {
               >
                 Delete
               </button> 
+
+              <button
+                onClick={() => toggleForm(acc.id, 'withdraw')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+              >
+                {activeForm[acc.id] === 'withdraw' ? 'Close Withdraw' : 'Withdraw'}
+              </button>
+
+              <button
+                onClick={() => toggleForm(acc.id, 'deposit')}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+              >
+                {activeForm[acc.id] === 'deposit' ? 'Close Deposit' : 'Deposit'}
+              </button>
+             </div>
+
+             <div className="mt-4">
+               {activeForm[acc.id] === 'withdraw' && (
+                 <WithdrawForm
+                   accountId={acc.id}
+                   onWithdrawSuccess={onDelete}
+                />
+                )}
+                {activeForm[acc.id] === 'deposit' && (
+                  <DepositForm
+                    accountId={acc.id}
+                    onDepositSuccess={onDelete}
+                 />
+               )}
             </div>
           </li>
         ))}
      </ul>
     );
 };
-
+};
 export default AccountList;
