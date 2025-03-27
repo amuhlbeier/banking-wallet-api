@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAccountById } from '../services/bankService';
-import DepositForm from '../components/DepositForm';
+import DepositForm from '../components/DepositForm.js';
 import WithdrawForm from '../components/WithdrawForm';
 import {
   getTransactionById,
@@ -34,6 +34,7 @@ const AccountDetailsPage = () => {
   return (
     <div className="p-8 space-y-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold">Account Details</h2>
+      <p><strong>Account ID:</strong> {account.accountId}</p>
       <p><strong>Account Number:</strong> {account.accountNumber}</p>
       <p><strong>Type:</strong> {account.type}</p>
       <p><strong>User ID:</strong> {account.userId}</p>

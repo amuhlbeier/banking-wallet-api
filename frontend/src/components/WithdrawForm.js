@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { withdrawFromAccount } from '../services/bankService';
+import { WithdrawFromAccount } from '../services/bankService';
 
 const WithdrawForm = ({ accountId, onWithdrawSuccess }) => {
   const [amount, setAmount] = useState('');
@@ -7,7 +7,7 @@ const WithdrawForm = ({ accountId, onWithdrawSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault(); 
     try {
-      await withdrawFromAccount(accountId, amount);
+      await WithdrawFromAccount(accountId, amount);
       setAmount(''); 
       onWithdrawSuccess(); 
     } catch (error) {

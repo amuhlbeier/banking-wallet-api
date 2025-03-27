@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate,} from 'react-router-d
 import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import AccountDetailsPage from './pages/AccountDetailsPage';
-import LoginPage from './pages/LoginPage';
 import StatementsPage from './pages/StatementsPage';
 import TransferPage from './pages/TransferPage';
 import UsersPage from './pages/UsersPage';
 import Navbar from './components/Navbar';
+import PaginatedTransactionsPage from './pages/PaginatedTransactionsPage';
 
 function App() {
   return (
@@ -19,9 +19,10 @@ function App() {
       <Route path="/accounts" element={<AccountsPage />} />
       <Route path="/transactions" element={<TransactionsPage />} />
       <Route path="/account/:id" element={<AccountDetailsPage />} />
-      <Route path="/login" element={<LoginPage />} />
       <Route path="/statements" element={<StatementsPage />} />
       <Route path="/transfer" element={<TransferPage />} />
+      <Route path="/transactions/paginated" element={<PaginatedTransactionsPage />} />
+
     </Routes>
   </Router>
   );

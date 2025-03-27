@@ -67,7 +67,7 @@ const AccountsPage = () => {
         {foundAccount && (
           <div className="border rounded p-4 bg-gray-50">
             <h4 className="text-md font-semibold mb-2">Account Details</h4>
-            <p><strong>ID:</strong> {foundAccount.id}</p>
+            <p><strong>Account ID:</strong> {foundAccount.accountId}</p>
             <p><strong>User ID:</strong> {foundAccount.userId}</p>
             <p><strong>Account Type:</strong> {foundAccount.accountType}</p>
             <p><strong>Balance:</strong> ${foundAccount.balance.toFixed(2)}</p>

@@ -1,4 +1,5 @@
 import api from '../api/axios';
+import axios from 'axios';
 
 export const createAccount = async (accountData) => {
   try {
@@ -53,12 +54,18 @@ export const WithdrawFromAccount = async (id, amount) => {
 export const getAllTransactions = async () => {
   try {
     const response = await api.get('/transactions');
-    return response.data;
+    return response.data.content;
   } catch (error) {
     console.error('Error fetching transactions:', error);
     throw error;
   }
 };
+
+export const getPaginatedTransactions = async (page, size) => {
+  const response = await axios.get(`/api/transactions?page=${page}&size=${size}`);
+  return response.data;
+};
+
 
 export const deleteAccount = async (id) => {
   try {
@@ -168,6 +175,16 @@ export const getTransactionById = async (id) => {
   try {
     const response = await api.get(`/transactions/${id}`);
     return response.data;
+  } catch (error) {
+    console.error('Error fetching transactions by ID: ', error);
+    throw error;
+  }
+};
+
+export const getTransactionsByAccountId = async (accountId) => {
+  try {
+  const response = await api.get(`/transactions/account/${accountId}`);
+  return response.data;
   } catch (error) {
     console.error('Error fetching transactions by ID: ', error);
     throw error;

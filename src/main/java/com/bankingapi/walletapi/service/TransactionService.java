@@ -93,11 +93,17 @@ public class TransactionService {
         public TransactionResponse mapToDTO (Transaction transaction){
             TransactionResponse dto = new TransactionResponse();
             dto.setTransactionId(transaction.getId());
-            dto.setSenderId(transaction.getSenderAccount().getId());
-            dto.setReceiverId(transaction.getReceiverAccount().getId());
             dto.setAmount(transaction.getAmount());
             dto.setDescription(transaction.getDescription());
             dto.setCreatedAt(transaction.getCreatedAt());
+
+            if (transaction.getSenderAccount() != null) {
+                dto.setSenderId(transaction.getSenderAccount().getId());
+            }
+
+            if (transaction.getReceiverAccount() != null) {
+                dto.setReceiverId(transaction.getReceiverAccount().getId());
+            }
             return dto;
         }
 
@@ -105,13 +111,23 @@ public class TransactionService {
             List<Transaction> sent = transactionRepository.findBySenderAccount_Id(accountId);
             List<Transaction> received = transactionRepository.findByReceiverAccount_Id(accountId);
 
-            List<Transaction> allTransactions = new ArrayList<>();
-            allTransactions.addAll(sent);
-            allTransactions.addAll(received);
+            List<TransactionResponse> allTransactions = new ArrayList<>();
 
-            return allTransactions.stream()
-                    .map(this::mapToDTO)
-                    .collect(Collectors.toList());
+            for (Transaction t : sent) {
+                TransactionResponse dto = mapToDTO(t);
+                dto.setAccountId(accountId);
+                dto.setType("DEBIT"); // money left this account
+                allTransactions.add(dto);
+            }
+
+            for (Transaction t : received) {
+                TransactionResponse dto = mapToDTO(t);
+                dto.setAccountId(accountId);
+                dto.setType("CREDIT"); // money entered this account
+                allTransactions.add(dto);
+            }
+
+            return allTransactions;
         }
 
         public List<TransactionResponse> getTransactionsByDateRange(LocalDateTime fromDate, LocalDateTime toDate) {
@@ -129,8 +145,20 @@ public class TransactionService {
         }
 
         public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
-           Page<Transaction> transactions = transactionRepository.findAll(pageable);
-           return transactions.map(this::mapToDTO);
+            Page<Transaction> transactions = transactionRepository.findAll(pageable);
+            return transactions.map(transaction -> {
+                TransactionResponse dto = mapToDTO(transaction);
+
+                if (transaction.getSenderAccount() != null) {
+                    dto.setAccountId(transaction.getSenderAccount().getId());
+                    dto.setType("DEBIT");
+                } else if (transaction.getReceiverAccount() != null) {
+                    dto.setAccountId(transaction.getReceiverAccount().getId());
+                    dto.setType("CREDIT");
+                }
+
+                return dto;
+            });
         }
 
         public void exportTransactionsToCsv(PrintWriter writer) {

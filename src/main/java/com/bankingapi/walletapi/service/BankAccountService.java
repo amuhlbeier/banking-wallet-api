@@ -201,6 +201,9 @@ public class BankAccountService {
     public BankAccountResponse mapToDTO(BankAccount account) {
         BankAccountResponse dto = new BankAccountResponse();
         dto.setAccountId(account.getId());
+        dto.setAccountNumber(account.getAccountNumber());
+        dto.setAccountType(account.getAccountType());
+        dto.setUserId(account.getUser().getId());
         dto.setBalance(account.getBalance());
         dto.setCreatedAt(account.getCreatedAt());
         dto.setFrozen(account.isFrozen());

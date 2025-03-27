@@ -18,6 +18,24 @@ public class BankAccountResponse {
     private Long accountId;
 
     @Schema(
+            description = "Account Number",
+            example = "123456789"
+    )
+    private String accountNumber;
+
+    @Schema(
+            description = "Type of the account",
+            example = "Checking"
+    )
+    private String accountType;
+
+    @Schema(
+            description = "User ID that owns this account",
+            example = "42"
+    )
+    private Long userId;
+
+    @Schema(
             description = "Balance of the bank account",
             example = "1000.50"
     )
@@ -29,6 +47,8 @@ public class BankAccountResponse {
     )
     private LocalDateTime createdAt;
 
-    @Schema(description = "Indiactes whether the account is frozen", example = "false")
+    @Schema(
+            description = "Indicates whether the account is frozen",
+            example = "false")
     private boolean frozen;
 }

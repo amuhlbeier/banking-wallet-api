@@ -58,7 +58,7 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<Page<TransactionResponse>> getAllTransactions(
             @RequestParam(defaultValue ="0") int page,
-            @RequestParam(defaultValue ="10") int size
+            @RequestParam(defaultValue ="5") int size
             ) {
         Pageable pageable = PageRequest.of(page, size);
         Page<TransactionResponse> paginatedTransactions = transactionService.getAllTransactions(pageable);
@@ -192,7 +192,7 @@ public class TransactionController {
                     description = "Internal server error")
     })
 
-    @GetMapping("/filter/amount)")
+    @GetMapping("/filter/amount")
     public ResponseEntity<List<TransactionResponse>> getTransactionsByAmountRange(
             @RequestParam("minAmount") BigDecimal minAmount,
             @RequestParam("maxAmount") BigDecimal maxAmount

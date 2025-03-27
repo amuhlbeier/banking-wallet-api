@@ -50,4 +50,13 @@ public class TransactionResponse {
             example = "2025-03-19T15:30:00"
     )
     private LocalDateTime createdAt;
+
+    private Long accountId;
+
+    @Schema(
+            description = "Type of transaction",
+            example = "Debit"
+    )
+    private String type;
+
 }

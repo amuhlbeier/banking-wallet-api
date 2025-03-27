@@ -2,23 +2,40 @@ import TransactionList from '../components/TransactionList';
 import React, { useState, useEffect } from 'react';
 import {
   getTransactionById,
+  getTransactionsByAccountId,
   getTransactionsByDateRange,
   getTransactionsByAmountRange,
   getAllTransactions,
   exportTransactionsToCSV,
+  getPaginatedTransactions,
 } from '../services/bankService';
-
-
 
 const TransactionsPage = () => {
     const [transactions, setTransactions] = useState([]);
     const [transactionIdSearch, setTransactionIdSearch] = useState('');
+    const [accountIdSearch, setAccountIdSearch] = useState('');
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [searchError, setSearchError] = useState('');
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [minAmount, setMinAmount] = useState('');
     const [maxAmount, setMaxAmount] = useState('');
+    const [paginatedTransactions, setPaginatedTransactions] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const pageSize = 5;
+
+    useEffect(() => {
+        const fetchPaginated = async () => {
+          try {
+            const result = await getPaginatedTransactions(currentPage, pageSize);
+            setPaginatedTransactions(result.content);
+          } catch (error) {
+            console.error('Error fetching paginated transactions', error);
+          }
+        };
+      
+        fetchPaginated();
+      }, [currentPage]);
 
     const fetchTransactions = async () => {
         try {
@@ -42,6 +59,23 @@ const TransactionsPage = () => {
         } catch (err) {
             setFilteredTransactions([]);
             setSearchError('Transaction not found.');
+        }
+      };
+
+      useEffect(() => {
+        fetchTransactions();
+      }, []);
+
+      const handleSearchByAccountId = async () => {
+        if (!accountIdSearch) return;
+        try {
+          const result = await getTransactionsByAccountId(accountIdSearch);
+          setFilteredTransactions(result);
+          setSearchError('');
+        } catch (err) {
+          console.error('Error fetching transactions by account ID:', err);
+          setFilteredTransactions([]);
+          setSearchError('Transactions not found.');
         }
       };
 
@@ -102,6 +136,41 @@ const TransactionsPage = () => {
                 >
                     Clear
                 </button>
+           </div>
+
+           <div className="space-y-2 bg-white p-4 rounded shadow">
+              <h3 className="text-lg font-semibold">Search by Account ID</h3>
+
+              <input
+                 type="number"
+                 placeholder="Enter Account ID"
+                 value={accountIdSearch}
+                 onChange={(e) => {
+                    console.log("Setting accountIdSearch to:", e.target.value);
+                    setAccountIdSearch(e.target.value);
+                }}
+                 className="w-full border p-2 rounded"
+              />
+
+              <div className="flex space-x-2 mt-2">
+                 <button
+                   onClick={handleSearchByAccountId}
+                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                 >
+                   Search
+                 </button>
+
+                 <button
+                   onClick={() => {
+                   setAccountIdSearch('');
+                   setFilteredTransactions([]);
+                   setSearchError('');
+                  }}
+                  className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                 >
+                  Clear
+                 </button>
+              </div>
            </div>
 
             <div className="space-y-2 bg-white p-4 rounded shadow">
@@ -199,8 +268,32 @@ const TransactionsPage = () => {
             {searchError && <p className="text-red-600 mt-2">{searchError}</p>}
           </div>
 
+          <h3 className="text-lg font-semibold mt-4">
+            {filteredTransactions.length > 0 ? 'Filtered Transactions' : 'All Transactions'}
+          </h3>
+
+
           <TransactionList transactions={
-            filteredTransactions.length > 0 ? filteredTransactions : transactions} />
+            filteredTransactions.length > 0 ? filteredTransactions : paginatedTransactions} />
+        
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+            disabled={currentPage === 0}
+            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+           <span className="text-gray-700 font-medium">Page {currentPage + 1}</span>
+
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            Next
+         </button>
+       </div>
         
         <button
            onClick={exportTransactionsToCSV}

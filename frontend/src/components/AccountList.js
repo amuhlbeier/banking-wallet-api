@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { deleteAccount, freezeAccount, unfreezeAccount } from '../services/bankService';
 import WithdrawForm from '../components/WithdrawForm';
-import DepositForm from '../components/DepositForm';
+import DepositForm from './DepositForm.js';
 
 const AccountList = ({ accounts, onDelete }) => {
     const [activeForm, setActiveForm] = useState({});
 
-const AccountList = ({ accounts, onDelete }) => {
     if (!accounts || accounts.length === 0) {
         return <p className ="text-gray-500">No accounts found.</p>
     }
@@ -18,10 +17,10 @@ const AccountList = ({ accounts, onDelete }) => {
         }));
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (accountId) => {
         if (window.confirm('Are you sure you want to delete this account?')) {
           try {
-            await deleteAccount(id);
+            await deleteAccount(accountId);
             onDelete(); 
           } catch (error) {
             console.error('Failed to delete account:', error);
@@ -29,19 +28,19 @@ const AccountList = ({ accounts, onDelete }) => {
         }
     };
       
-    const handleFreeze = async (id) => {
+    const handleFreeze = async (accountId) => {
         try {
-          await freezeAccount(id);
-          onDelete(); 
+          await freezeAccount(accountId);
+          alert('Account frozen successfully');
         } catch (error) {
           console.error('Failed to freeze account:', error);
         }
       };
     
-      const handleUnfreeze = async (id) => {
+      const handleUnfreeze = async (accountId) => {
         try {
-          await unfreezeAccount(id);
-          onDelete(); 
+          await unfreezeAccount(accountId);
+          alert('Account unfrozen successfully');
         } catch (error) {
           console.error('Failed to unfreeze account:', error);
         }
@@ -49,59 +48,63 @@ const AccountList = ({ accounts, onDelete }) => {
     return (
       <ul className="space-y-4">
         {accounts.map((acc) => (
-          <li key={acc.id} className="p-4 border rounded bg-white shadow-md">
+          <li key={acc.accountId} className="p-4 border rounded bg-white shadow-md">
+            <p><strong>Account ID:</strong> {acc.accountId}</p>
             <p><strong>Account Number:</strong> {acc.accountNumber}</p>
-            <p><strong>Type:</strong> {acc.type}</p>
+            <p><strong>Type:</strong> {acc.accountType}</p>
             <p><strong>User ID:</strong> {acc.userId}</p>
+            <p><strong>Balance:</strong> ${acc.balance.toFixed(2)}</p>
+            <p><strong>Status:</strong> {acc.frozen ? 'Frozen' : 'Active'}</p>
+
 
             <div className="space-x-2 mt-3">
               <button
-                onClick={() => handleFreeze(acc.id)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                onClick={() => handleFreeze(acc.accountId)}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
               >
                 Freeze
               </button>
 
               <button
-                onClick={() => handleUnfreeze(acc.id)}
-                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                onClick={() => handleUnfreeze(acc.accountId)}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
               >
                 Unfreeze
               </button>
 
 
               <button
-                onClick={() => handleDelete(acc.id)}
-                className="mt-3 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                onClick={() => handleDelete(acc.accountId)}
+                className="mt-3 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
               >
                 Delete
               </button> 
 
               <button
-                onClick={() => toggleForm(acc.id, 'withdraw')}
+                onClick={() => toggleForm(acc.accountId, 'withdraw')}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
               >
-                {activeForm[acc.id] === 'withdraw' ? 'Close Withdraw' : 'Withdraw'}
+                {activeForm[acc.accountId] === 'withdraw' ? 'Close Withdraw' : 'Withdraw'}
               </button>
 
               <button
-                onClick={() => toggleForm(acc.id, 'deposit')}
+                onClick={() => toggleForm(acc.accountId, 'deposit')}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
               >
-                {activeForm[acc.id] === 'deposit' ? 'Close Deposit' : 'Deposit'}
+                {activeForm[acc.accountId] === 'deposit' ? 'Close Deposit' : 'Deposit'}
               </button>
              </div>
 
              <div className="mt-4">
-               {activeForm[acc.id] === 'withdraw' && (
+               {activeForm[acc.accountId] === 'withdraw' && (
                  <WithdrawForm
-                   accountId={acc.id}
+                   accountId={acc.accountId}
                    onWithdrawSuccess={onDelete}
                 />
                 )}
-                {activeForm[acc.id] === 'deposit' && (
+                {activeForm[acc.accountId] === 'deposit' && (
                   <DepositForm
-                    accountId={acc.id}
+                    accountId={acc.accountId}
                     onDepositSuccess={onDelete}
                  />
                )}
@@ -110,6 +113,5 @@ const AccountList = ({ accounts, onDelete }) => {
         ))}
      </ul>
     );
-};
 };
 export default AccountList;
