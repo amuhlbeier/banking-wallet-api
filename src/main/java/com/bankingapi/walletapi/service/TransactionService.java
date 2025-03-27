@@ -3,10 +3,10 @@ package com.bankingapi.walletapi.service;
 import com.bankingapi.walletapi.dto.TransferRequest;
 import com.bankingapi.walletapi.model.BankAccount;
 import com.bankingapi.walletapi.model.Transaction;
+import com.bankingapi.walletapi.enums.TransactionType;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
 import com.bankingapi.walletapi.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class TransactionService {
         return mapToDTO(transaction);
     }
 
-    public TransactionResponse transferFunds(TransferRequest request) {
+    public List<TransactionResponse> transferFunds(TransferRequest request) {
         logger.info("Initiating transfer of amount: {}", request.getAmount());
         BankAccount sender = bankAccountRepository.findById(request.getSenderId())
                 .orElseThrow(() -> {
@@ -74,20 +74,30 @@ public class TransactionService {
         bankAccountRepository.save(receiver);
         bankAccountRepository.save(sender);
 
-        logger.info("Transfer completed. Sender new balance: {}", sender.getBalance());
+        logger.info("Transfer completed. Sender new balance: {}, Receiver new balance: {}", sender.getBalance(), receiver.getBalance());
 
-        Transaction transaction = new Transaction();
-        transaction.setSenderAccount(sender);
-        transaction.setReceiverAccount(receiver);
-        transaction.setAmount(amount);
-        transaction.setDescription(request.getDescription());
-        transaction.setCreatedAt(LocalDateTime.now());
+        Transaction debitTransaction = new Transaction();
+        debitTransaction.setSenderAccount(sender);
+        debitTransaction.setReceiverAccount(receiver);
+        debitTransaction.setAmount(amount);
+        debitTransaction.setTransactionType(TransactionType.DEBIT);
+        debitTransaction.setDescription("Transfer from account #" + receiver.getAccountNumber());
+        debitTransaction.setCreatedAt(LocalDateTime.now());
 
-        Transaction savedTransaction = transactionRepository.save(transaction);
-        logger.info("Transaction ID: {}", savedTransaction.getId());
+        Transaction creditTransaction = new Transaction();
+        creditTransaction.setSenderAccount(sender);
+        creditTransaction.setReceiverAccount(receiver);
+        creditTransaction.setAmount(amount);
+        creditTransaction.setTransactionType(TransactionType.CREDIT);
+        creditTransaction.setDescription("Transfer to account #" + sender.getAccountNumber());
+        creditTransaction.setCreatedAt(LocalDateTime.now());
 
-        return mapToDTO(savedTransaction);
+        transactionRepository.save(debitTransaction);
+        transactionRepository.save(creditTransaction);
 
+        logger.info("Created 2 transaction records: DEBIT and CREDIT");
+
+        return List.of(mapToDTO(debitTransaction), mapToDTO(creditTransaction));
     }
 
         public TransactionResponse mapToDTO (Transaction transaction){
@@ -95,6 +105,7 @@ public class TransactionService {
             dto.setTransactionId(transaction.getId());
             dto.setAmount(transaction.getAmount());
             dto.setDescription(transaction.getDescription());
+            dto.setTransactionType(transaction.getTransactionType());
             dto.setCreatedAt(transaction.getCreatedAt());
 
             if (transaction.getSenderAccount() != null) {
@@ -104,6 +115,29 @@ public class TransactionService {
             if (transaction.getReceiverAccount() != null) {
                 dto.setReceiverId(transaction.getReceiverAccount().getId());
             }
+
+            if (transaction.getTransactionType() == TransactionType.DEBIT) {
+                if (transaction.getSenderAccount() != null) {
+                    dto.setAccountId(transaction.getSenderAccount().getId());
+                }
+            } else if (transaction.getTransactionType() == TransactionType.CREDIT) {
+                if (transaction.getReceiverAccount() != null) {
+                    dto.setAccountId(transaction.getReceiverAccount().getId());
+                }
+            }
+
+        /*  != null) {
+                dto.setTransactionType(transaction.getTransactionType());
+            } else {
+                if (transaction.getSenderAccount() != null && transaction.getReceiverAccount() == null) {
+                    dto.setTransactionType(TransactionType.DEBIT);
+                } else if (transaction.getReceiverAccount() != null && transaction.getSenderAccount() == null) {
+                    dto.setTransactionType(TransactionType.CREDIT);
+                } else {
+                    dto.setTransactionType(null);
+                }
+            }
+        */
             return dto;
         }
 
@@ -115,15 +149,13 @@ public class TransactionService {
 
             for (Transaction t : sent) {
                 TransactionResponse dto = mapToDTO(t);
-                dto.setAccountId(accountId);
-                dto.setType("DEBIT"); // money left this account
+                //dto.setAccountId(accountId);
                 allTransactions.add(dto);
             }
 
             for (Transaction t : received) {
                 TransactionResponse dto = mapToDTO(t);
-                dto.setAccountId(accountId);
-                dto.setType("CREDIT"); // money entered this account
+               // dto.setAccountId(accountId);
                 allTransactions.add(dto);
             }
 
@@ -146,19 +178,7 @@ public class TransactionService {
 
         public Page<TransactionResponse> getAllTransactions(Pageable pageable) {
             Page<Transaction> transactions = transactionRepository.findAll(pageable);
-            return transactions.map(transaction -> {
-                TransactionResponse dto = mapToDTO(transaction);
-
-                if (transaction.getSenderAccount() != null) {
-                    dto.setAccountId(transaction.getSenderAccount().getId());
-                    dto.setType("DEBIT");
-                } else if (transaction.getReceiverAccount() != null) {
-                    dto.setAccountId(transaction.getReceiverAccount().getId());
-                    dto.setType("CREDIT");
-                }
-
-                return dto;
-            });
+                return transactions.map(this::mapToDTO);
         }
 
         public void exportTransactionsToCsv(PrintWriter writer) {
@@ -176,6 +196,4 @@ public class TransactionService {
                ));
            }
         }
-
-
 }

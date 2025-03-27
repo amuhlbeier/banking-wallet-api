@@ -17,7 +17,7 @@ const AccountForm = () => {
     e.preventDefault();
     try {
       const res = await createAccount(formData);
-      alert('Account created successfully!');
+      alert('Account created successfully! Please refresh the page to see it listed.');
       console.log(res.data);
     } catch (err) {
       console.error(err);

@@ -5,13 +5,11 @@ import {
   getTransactionsByAccountId,
   getTransactionsByDateRange,
   getTransactionsByAmountRange,
-  getAllTransactions,
   exportTransactionsToCSV,
   getPaginatedTransactions,
 } from '../services/bankService';
 
 const TransactionsPage = () => {
-    const [transactions, setTransactions] = useState([]);
     const [transactionIdSearch, setTransactionIdSearch] = useState('');
     const [accountIdSearch, setAccountIdSearch] = useState('');
     const [filteredTransactions, setFilteredTransactions] = useState([]);
@@ -37,18 +35,6 @@ const TransactionsPage = () => {
         fetchPaginated();
       }, [currentPage]);
 
-    const fetchTransactions = async () => {
-        try {
-          const data = await getAllTransactions();
-          setTransactions(data);
-        } catch (error) {
-          console.error('Error fetching transactions:', error);
-        }
-      };
-    
-      useEffect(() => {
-        fetchTransactions();
-      }, []);
 
       const handleSearchById = async () => {
         if (!transactionIdSearch) return;
@@ -61,10 +47,6 @@ const TransactionsPage = () => {
             setSearchError('Transaction not found.');
         }
       };
-
-      useEffect(() => {
-        fetchTransactions();
-      }, []);
 
       const handleSearchByAccountId = async () => {
         if (!accountIdSearch) return;
@@ -276,6 +258,7 @@ const TransactionsPage = () => {
           <TransactionList transactions={
             filteredTransactions.length > 0 ? filteredTransactions : paginatedTransactions} />
         
+        {filteredTransactions.length === 0 && (
         <div className="flex justify-center items-center gap-4 mt-6">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
@@ -294,6 +277,7 @@ const TransactionsPage = () => {
             Next
          </button>
        </div>
+        )}
         
         <button
            onClick={exportTransactionsToCSV}

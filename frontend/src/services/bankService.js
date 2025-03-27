@@ -1,5 +1,4 @@
 import api from '../api/axios';
-import axios from 'axios';
 
 export const createAccount = async (accountData) => {
   try {
@@ -53,7 +52,7 @@ export const WithdrawFromAccount = async (id, amount) => {
 
 export const getAllTransactions = async () => {
   try {
-    const response = await api.get('/transactions');
+    const response = await api.get('/transactions/paginated');
     return response.data.content;
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -62,7 +61,7 @@ export const getAllTransactions = async () => {
 };
 
 export const getPaginatedTransactions = async (page, size) => {
-  const response = await axios.get(`/api/transactions?page=${page}&size=${size}`);
+  const response = await api.get(`/transactions/paginated?page=${page}&size=${size}`);
   return response.data;
 };
 

@@ -19,7 +19,7 @@ const TransferForm = ({ onTransfer }) => {
 
     try {
       const result = await transferFunds(senderId, receiverId, amount, description);
-      setMessage(`Transfer successful! Transaction ID: ${result.transactionId}`);
+      setMessage(`Transfer successful! ` + result.map((tx, index) => `Transaction ID: ${tx.transactionId}`).join('\n'));
       setSenderId('');
       setReceiverId('');
       setAmount('');

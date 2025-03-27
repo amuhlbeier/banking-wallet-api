@@ -4,9 +4,13 @@ import com.bankingapi.walletapi.dto.BankAccountEvent;
 import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
+import com.bankingapi.walletapi.enums.TransactionType;
 import com.bankingapi.walletapi.model.BankAccount;
+import com.bankingapi.walletapi.model.Transaction;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
+import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.model.User;
+import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -18,11 +22,13 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 public class BankAccountService {
     private final BankAccountRepository bankAccountRepository;
+    private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final KafkaTemplate<String, BankAccountEvent> kafkaTemplate;
     private static final Logger logger = LoggerFactory.getLogger(BankAccountService.class);
@@ -31,8 +37,9 @@ public class BankAccountService {
     private static final BigDecimal MAX_OVERDRAFT = new BigDecimal("-100.00");
 
     @Autowired
-    public BankAccountService(BankAccountRepository bankAccountRepository, KafkaTemplate<String, BankAccountEvent> kafkaTemplate, UserRepository userRepository) {
+    public BankAccountService(BankAccountRepository bankAccountRepository, KafkaTemplate<String, BankAccountEvent> kafkaTemplate, UserRepository userRepository, TransactionRepository transactionRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionRepository = transactionRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.userRepository = userRepository;
     }
@@ -43,15 +50,25 @@ public class BankAccountService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+    private String generateUniqueAccountNumber() {
+        String accountNumber;
+        Random random = new Random();
+
+        do {
+            accountNumber = String.format("%09d", random.nextInt(1_000_000_000));
+        } while (bankAccountRepository.existsByAccountNumber(accountNumber));
+
+        return accountNumber;
+    }
+
     public BankAccountResponse createAccount(BankAccountRequest request) {
         logger.info("Creating a new bank account for user ID: {}", request.getUserId());
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
 
-
         BankAccount account = new BankAccount();
-        String generatedNumber = "ACCT-" + (int)(Math.random() * 1_000_000);
-        account.setAccountNumber(generatedNumber);
+        account.setAccountNumber(generateUniqueAccountNumber());
         account.setAccountType(request.getAccountType());
         account.setUser(user);
         account.setCreatedAt(LocalDateTime.now());
@@ -86,6 +103,15 @@ public class BankAccountService {
 
         account.setBalance(account.getBalance().add(request.getAmount()));
         BankAccount updated = bankAccountRepository.save(account);
+
+       Transaction transaction = new Transaction();
+       transaction.setSenderAccount(null);
+       transaction.setReceiverAccount(account);
+       transaction.setAmount(request.getAmount());
+       transaction.setTransactionType(TransactionType.CREDIT);
+       transaction.setDescription("Deposit to account #" + account.getAccountNumber());
+       transaction.setCreatedAt(LocalDateTime.now());
+       transactionRepository.save(transaction);
 
         BankAccountEvent event = new BankAccountEvent(
                 "DEPOSIT",

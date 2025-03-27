@@ -31,7 +31,7 @@ const AccountList = ({ accounts, onDelete }) => {
     const handleFreeze = async (accountId) => {
         try {
           await freezeAccount(accountId);
-          alert('Account frozen successfully');
+          alert('Account frozen successfully. Please refresh the page.');
         } catch (error) {
           console.error('Failed to freeze account:', error);
         }
@@ -40,7 +40,7 @@ const AccountList = ({ accounts, onDelete }) => {
       const handleUnfreeze = async (accountId) => {
         try {
           await unfreezeAccount(accountId);
-          alert('Account unfrozen successfully');
+          alert('Account unfrozen successfully. Please refresh the page.');
         } catch (error) {
           console.error('Failed to unfreeze account:', error);
         }

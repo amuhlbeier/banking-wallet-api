@@ -1,5 +1,6 @@
 package com.bankingapi.walletapi.model;
 
+import com.bankingapi.walletapi.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -31,5 +32,10 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "reciever_account_id")
     private BankAccount receiverAccount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable= false)
+    private TransactionType transactionType;
+
 
 }

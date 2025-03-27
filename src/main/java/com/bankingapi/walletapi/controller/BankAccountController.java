@@ -2,7 +2,6 @@ package com.bankingapi.walletapi.controller;
 import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
-import com.bankingapi.walletapi.model.User;
 import com.bankingapi.walletapi.service.BankAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.bankingapi.walletapi.model.BankAccount;
-import com.bankingapi.walletapi.repository.BankAccountRepository;
 
 import java.util.List;
 
@@ -23,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/accounts")
 public class BankAccountController {
 
-    private BankAccountService bankAccountService;
+    private final BankAccountService bankAccountService;
 
     @Autowired
     public BankAccountController(BankAccountService bankAccountService) {

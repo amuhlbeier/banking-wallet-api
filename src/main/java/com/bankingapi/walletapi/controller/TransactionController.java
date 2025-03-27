@@ -2,9 +2,9 @@ package com.bankingapi.walletapi.controller;
 
 import com.bankingapi.walletapi.dto.TransferRequest;
 import com.bankingapi.walletapi.model.Transaction;
-import com.bankingapi.walletapi.model.User;
 import com.bankingapi.walletapi.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,12 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 import com.bankingapi.walletapi.dto.TransactionResponse;
-import com.bankingapi.walletapi.dto.TransferRequest;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -55,7 +52,7 @@ public class TransactionController {
                     responseCode = "500",
                     description = "Internal server error")
     })
-    @GetMapping
+    @GetMapping("/paginated")
     public ResponseEntity<Page<TransactionResponse>> getAllTransactions(
             @RequestParam(defaultValue ="0") int page,
             @RequestParam(defaultValue ="5") int size
@@ -93,14 +90,14 @@ public class TransactionController {
 
     @Operation(
             summary = "Transfer funds between accounts",
-            description = "Creates a new transaction by transferring funds"
+            description = "Creates two new transactions by transferring funds between accounts of the same user"
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Funds successfully transferred",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TransactionResponse.class))
+                            array = @ArraySchema(schema= @Schema(implementation = TransactionResponse.class)))
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -114,9 +111,9 @@ public class TransactionController {
                     description = "Internal server error")
     })
     @PostMapping("/transfer")
-    public ResponseEntity<TransactionResponse> transferFunds(@RequestBody @Valid TransferRequest request) {
-        TransactionResponse result = transactionService.transferFunds(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<List<TransactionResponse>> transferFunds(@RequestBody @Valid TransferRequest request) {
+        List<TransactionResponse> result = transactionService.transferFunds(request);
+        return ResponseEntity.ok(result);
     }
 
 
