@@ -15,10 +15,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Arrays.stream;
 
 @Service
 public class PdfStatementService {

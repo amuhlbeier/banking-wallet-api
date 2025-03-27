@@ -10,7 +10,6 @@ import com.bankingapi.walletapi.model.Transaction;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
 import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.model.User;
-import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

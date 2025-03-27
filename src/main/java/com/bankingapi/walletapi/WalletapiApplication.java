@@ -7,7 +7,6 @@ import com.bankingapi.walletapi.model.User;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
 import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.repository.UserRepository;
-import com.bankingapi.walletapi.service.BankAccountService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,10 +24,13 @@ public class WalletapiApplication {
 	CommandLineRunner initData(
 			UserRepository userRepository,
 			BankAccountRepository accountRepository,
-			TransactionRepository transactionRepository,
-			BankAccountService bankAccountService
+			TransactionRepository transactionRepository
 	) {
 		return args -> {
+
+			if (userRepository.count() > 0 || accountRepository.count() > 0 || transactionRepository.count() > 0) {
+				return;
+			}
 
 			//users
 			User ella = new User();

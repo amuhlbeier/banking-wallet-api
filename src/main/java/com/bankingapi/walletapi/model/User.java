@@ -2,7 +2,6 @@ package com.bankingapi.walletapi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jdk.jfr.DataAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -125,19 +125,6 @@ public class TransactionService {
                     dto.setAccountId(transaction.getReceiverAccount().getId());
                 }
             }
-
-        /*  != null) {
-                dto.setTransactionType(transaction.getTransactionType());
-            } else {
-                if (transaction.getSenderAccount() != null && transaction.getReceiverAccount() == null) {
-                    dto.setTransactionType(TransactionType.DEBIT);
-                } else if (transaction.getReceiverAccount() != null && transaction.getSenderAccount() == null) {
-                    dto.setTransactionType(TransactionType.CREDIT);
-                } else {
-                    dto.setTransactionType(null);
-                }
-            }
-        */
             return dto;
         }
 
@@ -149,16 +136,13 @@ public class TransactionService {
 
             for (Transaction t : sent) {
                 TransactionResponse dto = mapToDTO(t);
-                //dto.setAccountId(accountId);
                 allTransactions.add(dto);
             }
 
             for (Transaction t : received) {
                 TransactionResponse dto = mapToDTO(t);
-               // dto.setAccountId(accountId);
                 allTransactions.add(dto);
             }
-
             return allTransactions;
         }
 

@@ -30,7 +30,7 @@ public class Transaction {
     private BankAccount senderAccount;
 
     @ManyToOne
-    @JoinColumn(name = "reciever_account_id")
+    @JoinColumn(name = "receiver_account_id")
     private BankAccount receiverAccount;
 
     @Enumerated(EnumType.STRING)
