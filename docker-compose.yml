@@ -38,3 +38,22 @@ services:
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     depends_on:
       - kafka
+
+  walletapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: walletapi
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/walletdb
+      SPRING_DATASOURCE_USERNAME: walletuser
+      SPRING_DATASOURCE_PASSWORD: wallet
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+
+
+
