@@ -191,8 +191,8 @@ public class BankAccountService {
         BankAccount updated = bankAccountRepository.save(account);
 
        Transaction transaction = new Transaction();
-       transaction.setSenderAccount(null);
-       transaction.setReceiverAccount(account);
+       transaction.setSenderAccount(account);
+       transaction.setReceiverAccount(null);
        transaction.setAmount(request.getAmount());
        transaction.setTransactionType(TransactionType.DEBIT);
        transaction.setDescription("Withdrawal from account #" + account.getAccountNumber());
