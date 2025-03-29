@@ -58,6 +58,12 @@ public class TransactionResponse {
     private Long accountId;
 
     @Schema(
+            description = "Account number of the viewer of the transaction",
+            example = "123456789"
+    )
+    private String accountNumber;
+
+    @Schema(
             description = "Type of transaction",
             example = "Debit"
     )

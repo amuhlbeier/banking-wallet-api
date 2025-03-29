@@ -149,8 +149,8 @@ public class BankAccountService {
             throw new RuntimeException("Account is frozen. Withdrawal denied.");
         }
 
-
         BigDecimal projectedBalance = account.getBalance().subtract(request.getAmount());
+
 
         if (projectedBalance.compareTo(MAX_OVERDRAFT) < 0) {
             BankAccountEvent overdraftEvent =  new BankAccountEvent(
@@ -189,6 +189,15 @@ public class BankAccountService {
 
         account.setBalance(projectedBalance);
         BankAccount updated = bankAccountRepository.save(account);
+
+       Transaction transaction = new Transaction();
+       transaction.setSenderAccount(null);
+       transaction.setReceiverAccount(account);
+       transaction.setAmount(request.getAmount());
+       transaction.setTransactionType(TransactionType.DEBIT);
+       transaction.setDescription("Withdrawal from account #" + account.getAccountNumber());
+       transaction.setCreatedAt(LocalDateTime.now());
+       transactionRepository.save(transaction);
 
        BankAccountEvent withdrawalEvent =  new BankAccountEvent(
                "WITHDRAWAL",
