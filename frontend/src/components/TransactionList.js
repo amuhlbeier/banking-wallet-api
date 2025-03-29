@@ -13,7 +13,6 @@ const TransactionList = ({ transactions }) => {
           <p><strong>Transaction Type:</strong> {tx.transactionType}</p>
           <p><strong>Amount:</strong> ${tx.amount}</p>
           <p><strong>Account ID:</strong> {tx.accountId}</p>
-          <p><strong>Account Number:</strong> {tx.accountNumber}</p>
           <p><strong>Timestamp:</strong> {new Date(tx.createdAt).toLocaleString()}</p>
           <p><strong>Description:</strong> {tx.description}</p>
         </li>
