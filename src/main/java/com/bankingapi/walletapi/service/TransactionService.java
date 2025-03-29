@@ -170,10 +170,10 @@ public class TransactionService {
 
            writer.println("Transaction ID, Sender ID, Receiver ID, Amount, Description,CreatedAt");
            for (Transaction t : transactions) {
-               writer.println(String.format("%d,%d,%d,%.2f,%s,%s",
+               writer.println(String.format("%d,%s,%s,%.2f,%s,%s",
                        t.getId(),
-                       t.getSenderAccount().getId(),
-                       t.getReceiverAccount().getId(),
+                       t.getSenderAccount() != null ? t.getSenderAccount().getId() : "N/A",
+                       t.getReceiverAccount() != null ? t.getReceiverAccount().getId() : "N/A",
                        t.getAmount(),
                        t.getDescription(),
                        t.getCreatedAt().toString()
