@@ -74,6 +74,16 @@ public class BankAccountService {
         account.setBalance(BigDecimal.ZERO);
 
         BankAccount saved = bankAccountRepository.save(account);
+
+        BankAccountEvent event = new BankAccountEvent(
+                "ACCOUNT_CREATED",
+                saved.getId(),
+                saved.getBalance(),
+                LocalDateTime.now(),
+                "New account created"
+        );
+        kafkaTemplate.send("bank-account-events", event);
+
         logger.info("Bank account successfully created for user ID: {}", request.getUserId());
         return mapToDTO(saved);
     }
@@ -119,7 +129,7 @@ public class BankAccountService {
                 LocalDateTime.now(),
                 "Deposit successful"
         );
-        kafkaTemplate.send("account-events", event);
+        kafkaTemplate.send("bank-account-events", event);
 
         logger.info("Deposit successful. New balance for account ID {}: {}", accountId, updated.getBalance());
         return mapToDTO(updated);
@@ -146,11 +156,11 @@ public class BankAccountService {
             BankAccountEvent overdraftEvent =  new BankAccountEvent(
                     "OVERDRAFT_EXCEEDED",
                     accountId,
-                    account.getBalance(),
+                    projectedBalance,
                     LocalDateTime.now(),
                     "Overdraft limit exceeded"
             );
-            kafkaTemplate.send("account-events", overdraftEvent);
+            kafkaTemplate.send("bank-account-events", overdraftEvent);
             throw new RuntimeException("Overdraft limit exceeded. Withdrawal denied.");
         }
 
@@ -158,16 +168,16 @@ public class BankAccountService {
             BankAccountEvent alertEvent =  new BankAccountEvent(
                     "BALANCE_ALERT",
                     accountId,
-                    account.getBalance(),
+                    projectedBalance,
                     LocalDateTime.now(),
                     "Balance dropped below minimum limit"
             );
-            kafkaTemplate.send("account-events", alertEvent);
+            kafkaTemplate.send("bank-account-events", alertEvent);
         }
 
        if (projectedBalance.compareTo(BigDecimal.ZERO) < 0 && projectedBalance.compareTo(MAX_OVERDRAFT) <= 0) {
            account.setFrozen(true);
-           kafkaTemplate.send("account-events", new BankAccountEvent(
+           kafkaTemplate.send("bank-account-events", new BankAccountEvent(
                    "ACCOUNT_FROZEN",
                    accountId,
                    account.getBalance(),
@@ -187,7 +197,7 @@ public class BankAccountService {
                LocalDateTime.now(),
                "Withdrawal successful"
        );
-        kafkaTemplate.send("account-events", withdrawalEvent);
+        kafkaTemplate.send("bank-account-events", withdrawalEvent);
         return mapToDTO (updated);
    }
 
@@ -204,7 +214,7 @@ public class BankAccountService {
                LocalDateTime.now(),
                "Account manually frozen"
         );
-        kafkaTemplate.send("account-events", event);
+        kafkaTemplate.send("bank-account-events", event);
    }
 
    public void unfreezeAccount(Long accountId) {
@@ -220,7 +230,7 @@ public class BankAccountService {
                LocalDateTime.now(),
                "Account manually unfrozen"
        );
-       kafkaTemplate.send("account-events", event);
+       kafkaTemplate.send("bank-account-events", event);
    }
 
     public BankAccountResponse mapToDTO(BankAccount account) {

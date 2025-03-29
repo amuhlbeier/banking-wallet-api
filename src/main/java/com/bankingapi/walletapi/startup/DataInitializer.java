@@ -24,7 +24,6 @@ public class DataInitializer implements CommandLineRunner{
         this.bankAccountRepository = bankAccountRepository;
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
-
     }
 
     @Override

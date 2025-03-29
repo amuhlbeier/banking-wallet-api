@@ -1,6 +1,8 @@
 # Use OpenJDK image
 FROM openjdk:17-jdk-slim
 
+LABEL maintainer="alessandra_muhlbeier"
+
 # Set the working directory
 WORKDIR /app
 
