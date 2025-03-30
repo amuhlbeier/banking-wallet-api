@@ -1,6 +1,8 @@
 # Use OpenJDK image
 FROM openjdk:17-jdk-slim
 
+RUN apt-get update && apt-get install -y curl
+
 LABEL maintainer="alessandra_muhlbeier"
 
 # Set the working directory

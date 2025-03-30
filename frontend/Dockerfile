@@ -1,13 +1,14 @@
-FROM node:18
 
+FROM node:18 as build
 WORKDIR /app
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
+RUN npm run build
 
-ENV NODE_ENV=development
 
-CMD ["npm", "start"]
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

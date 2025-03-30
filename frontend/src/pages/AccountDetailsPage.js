@@ -3,13 +3,6 @@ import { useParams } from 'react-router-dom';
 import { getAccountById } from '../services/bankService';
 import DepositForm from '../components/DepositForm.js';
 import WithdrawForm from '../components/WithdrawForm';
-import {
-  getTransactionById,
-  getTransactionsByDateRange,
-  getTransactionsByAmountRange,
-  getAllTransactions,
-  exportTransactionsToCSV,
-} from '../services/bankService';
 
 
 const AccountDetailsPage = () => {

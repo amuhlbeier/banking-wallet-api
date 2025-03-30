@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { createAccount } from '../services/bankService';
-import { getAllAccounts } from '../services/bankService';
-
 
 const AccountForm = () => {
   const [formData, setFormData] = useState({
