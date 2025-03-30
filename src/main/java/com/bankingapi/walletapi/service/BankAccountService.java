@@ -5,6 +5,9 @@ import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
 import com.bankingapi.walletapi.enums.TransactionType;
+import com.bankingapi.walletapi.exception.AccountFrozenException;
+import com.bankingapi.walletapi.exception.InsufficientFundsException;
+import com.bankingapi.walletapi.exception.ResourceNotFoundException;
 import com.bankingapi.walletapi.model.BankAccount;
 import com.bankingapi.walletapi.model.Transaction;
 import com.bankingapi.walletapi.repository.BankAccountRepository;
@@ -64,7 +67,7 @@ public class BankAccountService {
     public BankAccountResponse createAccount(BankAccountRequest request) {
         logger.info("Creating a new bank account for user ID: {}", request.getUserId());
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.getUserId()));
 
         BankAccount account = new BankAccount();
         account.setAccountNumber(generateUniqueAccountNumber());
@@ -90,7 +93,7 @@ public class BankAccountService {
 
     public BankAccountResponse getAccountById(Long id) {
         BankAccount account = bankAccountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Bank account with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account with id " + id + " not found"));
         return mapToDTO(account);
     }
 
@@ -104,10 +107,10 @@ public class BankAccountService {
         logger.info("Depositing {} into account ID: {}", request.getAmount(), accountId);
 
        BankAccount account = bankAccountRepository.findById(accountId)
-               .orElseThrow(() -> new RuntimeException("Account not found"));
+               .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
        if (account.isFrozen()) {
-           throw new RuntimeException("Account is frozen. Deposit denied.");
+           throw new AccountFrozenException("Account is frozen. Deposit denied.");
        }
 
         account.setBalance(account.getBalance().add(request.getAmount()));
@@ -139,14 +142,14 @@ public class BankAccountService {
         logger.info("Withdrawing {} out of account ID: {}", request.getAmount(), accountId);
 
        BankAccount account = bankAccountRepository.findById(accountId)
-               .orElseThrow(() -> new RuntimeException("Account not found"));
+               .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         if (account.getBalance().compareTo(request.getAmount()) < 0) {
-            throw new RuntimeException("Insufficient funds");
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         if (account.isFrozen()) {
-            throw new RuntimeException("Account is frozen. Withdrawal denied.");
+            throw new AccountFrozenException("Account is frozen. Withdrawal denied.");
         }
 
         BigDecimal projectedBalance = account.getBalance().subtract(request.getAmount());
@@ -161,7 +164,7 @@ public class BankAccountService {
                     "Overdraft limit exceeded"
             );
             kafkaTemplate.send("bank-account-events", overdraftEvent);
-            throw new RuntimeException("Overdraft limit exceeded. Withdrawal denied.");
+            throw new InsufficientFundsException("Overdraft limit exceeded. Withdrawal denied.");
         }
 
         if (projectedBalance.compareTo(MIN_BALANCE) < 0 && projectedBalance.compareTo(BigDecimal.ZERO) >= 0) {
@@ -212,7 +215,7 @@ public class BankAccountService {
 
    public void freezeAccount(Long accountId) {
         BankAccount account = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Bank account with id " + accountId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account with id " + accountId + " not found"));
         account.setFrozen(true);
         bankAccountRepository.save(account);
 
@@ -228,7 +231,7 @@ public class BankAccountService {
 
    public void unfreezeAccount(Long accountId) {
         BankAccount account = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Bank account with id " + accountId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bank account with id " + accountId + " not found"));
         account.setFrozen(false);
         bankAccountRepository.save(account);
 

@@ -25,4 +25,25 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ResponseEntity<>( ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<String> handleInsufficientFunds(InsufficientFundsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccountFrozenException.class)
+    public ResponseEntity<String> handleAccountFrozen(AccountFrozenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneral(Exception ex) {
+        return new ResponseEntity<>("Something went wrong.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

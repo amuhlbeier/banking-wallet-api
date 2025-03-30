@@ -1,6 +1,8 @@
 package com.bankingapi.walletapi.service;
 
 import com.bankingapi.walletapi.dto.TransferRequest;
+import com.bankingapi.walletapi.exception.InsufficientFundsException;
+import com.bankingapi.walletapi.exception.ResourceNotFoundException;
 import com.bankingapi.walletapi.model.BankAccount;
 import com.bankingapi.walletapi.model.Transaction;
 import com.bankingapi.walletapi.enums.TransactionType;
@@ -41,7 +43,7 @@ public class TransactionService {
 
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found."));
     }
 
     public TransactionResponse getTransactionResponseById(Long id) {
@@ -54,18 +56,18 @@ public class TransactionService {
         BankAccount sender = bankAccountRepository.findById(request.getSenderId())
                 .orElseThrow(() -> {
                     logger.error("Sender account with ID {} not found", request.getSenderId());
-                    return new RuntimeException("Sender account not found.");
+                    return new ResourceNotFoundException("Sender account not found.");
                 });
 
         BankAccount receiver = bankAccountRepository.findById(request.getReceiverId())
                 .orElseThrow(() -> {
                     logger.error("Receiver account with ID {} not found.", request.getReceiverId());
-                    return new RuntimeException("Receiver account not found.");
+                    return new ResourceNotFoundException("Receiver account not found.");
                 });
 
         BigDecimal amount = request.getAmount();
         if (sender.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient funds in sender account.");
+            throw new InsufficientFundsException("Insufficient funds in sender account.");
         }
 
         sender.setBalance(sender.getBalance().subtract(amount));
