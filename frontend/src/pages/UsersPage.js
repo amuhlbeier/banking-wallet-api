@@ -14,6 +14,7 @@ const UsersPage = () => {
       setSingleUser(null);
       setError('');
     } catch (err) {
+      console.error('Error fetching users:', err);  
       setUsers([]);
       setError('Failed to fetch users.');
     }

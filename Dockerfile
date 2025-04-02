@@ -1,18 +1,10 @@
-# Use OpenJDK image
-FROM openjdk:17-jdk-slim
-
-RUN apt-get update && apt-get install -y curl
-
-LABEL maintainer="alessandra_muhlbeier"
-
-# Set the working directory
+FROM eclipse-temurin:17-jdk as build
 WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
 
-# Copy built JAR file into the container
-COPY target/walletapi-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port the app will run on
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY --from=build /app/target/walletapi-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-# Run the JAR file when the container starts
 ENTRYPOINT ["java", "-jar", "app.jar"]

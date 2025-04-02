@@ -1,9 +1,14 @@
-version: '3.8'
+version: '3.9'
+
+networks:
+  walletnet:
 
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
+    networks:
+      - walletnet
     ports:
       - "2181:2181"
     environment:
@@ -13,23 +18,27 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
+    networks:
+      - walletnet
     ports:
       - "9092:9092"
-      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms512m"
     depends_on:
       - zookeeper
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
+    networks:
+      - walletnet
     ports:
       - "8081:8080"
     environment:
@@ -39,11 +48,28 @@ services:
     depends_on:
       - kafka
 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    networks:
+      - walletnet
+    environment:
+      POSTGRES_DB: walletdb
+      POSTGRES_USER: walletuser
+      POSTGRES_PASSWORD: wallet
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   walletapi:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: walletapi
+    networks:
+      - walletnet
     ports:
       - "8080:8080"
     depends_on:
@@ -60,35 +86,25 @@ services:
       timeout: 10s
       retries: 3
 
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_DB: walletdb
-      POSTGRES_USER: walletuser
-      POSTGRES_PASSWORD: wallet
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
   frontend:
     build:
       context: ./frontend
+      args:
+        REACT_APP_API_BASE_URL: /api
+      dockerfile: Dockerfile
     container_name: frontend
+    networks:
+      - walletnet
     ports:
       - "80:80"
     depends_on:
       - walletapi
+    restart: always
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
       interval: 30s
       timeout: 10s
       retries: 3
 
 volumes:
   pgdata:
-
-
-

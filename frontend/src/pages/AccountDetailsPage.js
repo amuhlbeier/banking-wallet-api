@@ -4,7 +4,6 @@ import { getAccountById } from '../services/bankService';
 import DepositForm from '../components/DepositForm.js';
 import WithdrawForm from '../components/WithdrawForm';
 
-
 const AccountDetailsPage = () => {
   const { id } = useParams();
   const [account, setAccount] = useState(null);

@@ -22,7 +22,6 @@ const StatementsPage = () => {
 
     const from = new Date(fromDate).toISOString();
     const to = new Date(toDate).toISOString();
-
     exportStatementsToPDF(accountIdFull, from, to);
   };
 

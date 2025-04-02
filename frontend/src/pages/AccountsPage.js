@@ -9,7 +9,6 @@ const AccountsPage = () => {
   const [foundAccount, setFoundAccount] = useState(null);
   const [searchError, setSearchError] = useState('');
 
-
   const fetchAccounts = async () => {
     try {
       const data = await getAllAccounts();
