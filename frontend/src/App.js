@@ -21,12 +21,29 @@ function App() {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-  
-    if (!storedToken || storedToken.split('.').length !== 3) {
-      localStorage.removeItem('token');
+
+    if (storedToken) {
+      const [, payload] = storedToken.split('.');
+      try {
+        const decoded = JSON.parse(atob(payload));
+        const now = Math.floor(Date.now() / 1000);
+        
+        if (decoded.exp < now) {
+          localStorage.removeItem('token');
+          setToken(null);
+          window.location = '/';
+        }
+      } catch (err) {
+        localStorage.removeItem('token');
+        setToken(null);
+        window.location = '/';
+      }
+    } else {
       setToken(null);
     }
   }, []);
+  
+
 
   return (
     <Router>
