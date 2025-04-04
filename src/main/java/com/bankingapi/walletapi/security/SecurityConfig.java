@@ -50,11 +50,6 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-<<<<<<< HEAD
-                               
-                               
-                               
-=======
                              "/api/auth/login",
                              "/api/auth/login/",
                              "/actuator/health",
@@ -64,7 +59,6 @@ public class SecurityConfig {
                              "/v3/api-docs/**",
                              "/swagger-resources/**",
                              "/webjars/**"
->>>>>>> 7ead9b2 (Final deployment tweaks and security config updates)
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
