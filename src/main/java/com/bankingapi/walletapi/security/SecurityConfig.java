@@ -50,13 +50,21 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/login/",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**"
+<<<<<<< HEAD
+                               
+                               
+                               
+=======
+                             "/api/auth/login",
+                             "/api/auth/login/",
+                             "/actuator/health",
+                             "/api/auth/login",
+                             "/swagger-ui.html",
+                             "/swagger-ui/**",
+                             "/v3/api-docs/**",
+                             "/swagger-resources/**",
+                             "/webjars/**"
+>>>>>>> 7ead9b2 (Final deployment tweaks and security config updates)
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -69,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost"));  // In production, specify actual origins
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost","http://44.220.157.108"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
@@ -77,6 +85,13 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
+                
+                
+                        
+                                
+                                       
+                                        
+                                 
+             
 
 }
