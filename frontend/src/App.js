@@ -43,8 +43,6 @@ function App() {
     }
   }, []);
   
-
-
   return (
     <Router>
       {token && <Navbar />}

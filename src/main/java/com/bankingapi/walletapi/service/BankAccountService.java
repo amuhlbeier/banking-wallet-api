@@ -1,6 +1,5 @@
 package com.bankingapi.walletapi.service;
 
-import com.bankingapi.walletapi.dto.BankAccountEvent;
 import com.bankingapi.walletapi.dto.BankAccountRequest;
 import com.bankingapi.walletapi.dto.BankAccountResponse;
 import com.bankingapi.walletapi.dto.DepositWithdrawRequest;
@@ -15,11 +14,9 @@ import com.bankingapi.walletapi.repository.TransactionRepository;
 import com.bankingapi.walletapi.model.User;
 import com.bankingapi.walletapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,17 +29,15 @@ public class BankAccountService {
     private final BankAccountRepository bankAccountRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-    private final KafkaTemplate<String, BankAccountEvent> kafkaTemplate;
     private static final Logger logger = LoggerFactory.getLogger(BankAccountService.class);
 
     private static final BigDecimal MIN_BALANCE = new BigDecimal("50.00");
     private static final BigDecimal MAX_OVERDRAFT = new BigDecimal("-100.00");
 
     @Autowired
-    public BankAccountService(BankAccountRepository bankAccountRepository, KafkaTemplate<String, BankAccountEvent> kafkaTemplate, UserRepository userRepository, TransactionRepository transactionRepository) {
+    public BankAccountService(BankAccountRepository bankAccountRepository, UserRepository userRepository, TransactionRepository transactionRepository) {
         this.bankAccountRepository = bankAccountRepository;
         this.transactionRepository = transactionRepository;
-        this.kafkaTemplate = kafkaTemplate;
         this.userRepository = userRepository;
     }
 
@@ -77,15 +72,6 @@ public class BankAccountService {
         account.setBalance(BigDecimal.ZERO);
 
         BankAccount saved = bankAccountRepository.save(account);
-
-        BankAccountEvent event = new BankAccountEvent(
-                "ACCOUNT_CREATED",
-                saved.getId(),
-                saved.getBalance(),
-                LocalDateTime.now(),
-                "New account created"
-        );
-        kafkaTemplate.send("bank-account-events", event);
 
         logger.info("Bank account successfully created for user ID: {}", request.getUserId());
         return mapToDTO(saved);
@@ -125,15 +111,6 @@ public class BankAccountService {
        transaction.setCreatedAt(LocalDateTime.now());
        transactionRepository.save(transaction);
 
-        BankAccountEvent event = new BankAccountEvent(
-                "DEPOSIT",
-                accountId,
-                account.getBalance(),
-                LocalDateTime.now(),
-                "Deposit successful"
-        );
-        kafkaTemplate.send("bank-account-events", event);
-
         logger.info("Deposit successful. New balance for account ID {}: {}", accountId, updated.getBalance());
         return mapToDTO(updated);
    }
@@ -154,39 +131,16 @@ public class BankAccountService {
 
         BigDecimal projectedBalance = account.getBalance().subtract(request.getAmount());
 
-
         if (projectedBalance.compareTo(MAX_OVERDRAFT) < 0) {
-            BankAccountEvent overdraftEvent =  new BankAccountEvent(
-                    "OVERDRAFT_EXCEEDED",
-                    accountId,
-                    projectedBalance,
-                    LocalDateTime.now(),
-                    "Overdraft limit exceeded"
-            );
-            kafkaTemplate.send("bank-account-events", overdraftEvent);
             throw new InsufficientFundsException("Overdraft limit exceeded. Withdrawal denied.");
         }
 
         if (projectedBalance.compareTo(MIN_BALANCE) < 0 && projectedBalance.compareTo(BigDecimal.ZERO) >= 0) {
-            BankAccountEvent alertEvent =  new BankAccountEvent(
-                    "BALANCE_ALERT",
-                    accountId,
-                    projectedBalance,
-                    LocalDateTime.now(),
-                    "Balance dropped below minimum limit"
-            );
-            kafkaTemplate.send("bank-account-events", alertEvent);
+            logger.warn("Balance alert for account {}", accountId);
         }
 
        if (projectedBalance.compareTo(BigDecimal.ZERO) < 0 && projectedBalance.compareTo(MAX_OVERDRAFT) <= 0) {
            account.setFrozen(true);
-           kafkaTemplate.send("bank-account-events", new BankAccountEvent(
-                   "ACCOUNT_FROZEN",
-                   accountId,
-                   account.getBalance(),
-                   LocalDateTime.now(),
-                   "Account frozen due to overdraft"
-           ));
            logger.info("Account {} auto-frozen due to overdraft.", accountId);
        }
 
@@ -202,14 +156,6 @@ public class BankAccountService {
        transaction.setCreatedAt(LocalDateTime.now());
        transactionRepository.save(transaction);
 
-       BankAccountEvent withdrawalEvent =  new BankAccountEvent(
-               "WITHDRAWAL",
-               accountId,
-               updated.getBalance(),
-               LocalDateTime.now(),
-               "Withdrawal successful"
-       );
-        kafkaTemplate.send("bank-account-events", withdrawalEvent);
         return mapToDTO (updated);
    }
 
@@ -218,15 +164,6 @@ public class BankAccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account with id " + accountId + " not found"));
         account.setFrozen(true);
         bankAccountRepository.save(account);
-
-        BankAccountEvent event = new BankAccountEvent(
-               "MANUAL_FREEZE",
-               accountId,
-               account.getBalance(),
-               LocalDateTime.now(),
-               "Account manually frozen"
-        );
-        kafkaTemplate.send("bank-account-events", event);
    }
 
    public void unfreezeAccount(Long accountId) {
@@ -234,15 +171,6 @@ public class BankAccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account with id " + accountId + " not found"));
         account.setFrozen(false);
         bankAccountRepository.save(account);
-
-       BankAccountEvent event =  new BankAccountEvent(
-               "ACCOUNT_UNFROZEN",
-               accountId,
-               account.getBalance(),
-               LocalDateTime.now(),
-               "Account manually unfrozen"
-       );
-       kafkaTemplate.send("bank-account-events", event);
    }
 
     public BankAccountResponse mapToDTO(BankAccount account) {
