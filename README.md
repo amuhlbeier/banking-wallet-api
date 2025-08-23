@@ -73,6 +73,7 @@ docker compose up --build
 
 ### Frontend
 - [http://localhost](http://localhost)
+  (username = `admin` / password = `adminpassword`)
 
 ### Swagger Docs
 - [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
