@@ -64,7 +64,7 @@ Built to showcase backend engineering practices such as layered architecture, DT
 
 ```
 # Clone the repo
-git clone https://github.com/yourusername/banking-wallet-api.git
+git clone https://github.com/amuhlbeier/banking-wallet-api.git
 cd banking-wallet-api
 
 # Build and run all containers
