@@ -72,14 +72,24 @@ docker compose up --build
 ```
 
 ### Frontend
-- [http://localhost](http://localhost)
-  (username = `admin` / password = `adminpassword`)
+- [http://localhost](http://localhost)  (username = `admin` / password = `adminpassword`)
 
 ### Swagger Docs
 - [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ### Health Check
 - [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
+
+
+## Testing Endpoints in Swagger with JWT
+1. Open [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
+2. Use the `/api/auth/login` endpoint with the default credentials:
+  - Username: `admin`
+  - Password: `adminpassword`
+3. Copy the JWT token from the login response.
+4. Click the Authorize button in the Swagger UI (top right).
+5. Paste the token in the value field
+
 
 ## Notable Design Decisions
 - **Java & Spring Boot** → production-grade backend stack, common in fintech
